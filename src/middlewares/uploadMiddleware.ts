@@ -1,5 +1,6 @@
 import multer from "multer";
 import { Request } from "express";
+import { RESPONSE_MESSAGES } from "../constants/responses";
 
 const storage = multer.diskStorage({
   destination: "uploads/",
@@ -14,7 +15,7 @@ const upload = multer({
     if (file.mimetype === "application/pdf") {
       cb(null, true);
     } else {
-      cb(new Error("Only PDF files allowed"));
+      cb(new Error(RESPONSE_MESSAGES.ONLY_PDF_ALLOWED));
     }
   },
 });
