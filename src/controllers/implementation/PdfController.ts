@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import path from "path";
-import { IPdfController } from "../interfaces/IPdfController";
-import { IPdfService } from "../../services/interfaces/IPdfService";
+import { IPdfController } from "../../interfaces/IPdfController";
+import { IPdfService } from "../../interfaces/IPdfService";
 import { HTTP_STATUS, RESPONSE_MESSAGES } from "../../constants/responses";
 
 export class PdfController implements IPdfController {

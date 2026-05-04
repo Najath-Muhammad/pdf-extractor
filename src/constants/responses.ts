@@ -12,4 +12,6 @@ export const RESPONSE_MESSAGES = {
   EXTRACT_FAILED: "Extraction failed",
   MISSING_EXTRACT_PARAMS: "filePath and a non-empty pages array are required",
   ONLY_PDF_ALLOWED: "Only PDF files allowed",
+  FILE_NOT_FOUND: (path: string) => `File not found: ${path}`,
+  NO_VALID_PAGES: (totalPages: number) => `No valid pages selected. PDF has ${totalPages} page(s).`
 };

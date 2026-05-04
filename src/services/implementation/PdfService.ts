@@ -1,7 +1,8 @@
 import { PDFDocument } from "pdf-lib";
 import fs from "fs";
 import path from "path";
-import { IPdfService } from "../interfaces/IPdfService";
+import { IPdfService } from "../../interfaces/IPdfService";
+import { RESPONSE_MESSAGES } from "../../constants/responses";
 
 export class PdfService implements IPdfService {
   private resolvePath(filePath: string): string {
@@ -10,7 +11,7 @@ export class PdfService implements IPdfService {
       : path.join(process.cwd(), filePath);
 
     if (!fs.existsSync(absolute)) {
-      throw new Error(`File not found: ${absolute}`);
+      throw new Error(RESPONSE_MESSAGES.FILE_NOT_FOUND(absolute));
     }
 
     return absolute;
@@ -32,7 +33,7 @@ export class PdfService implements IPdfService {
 
     const validPages = pages.filter((p) => p >= 1 && p <= totalPages);
     if (validPages.length === 0) {
-      throw new Error(`No valid pages selected. PDF has ${totalPages} page(s).`);
+      throw new Error(RESPONSE_MESSAGES.NO_VALID_PAGES(totalPages));
     }
 
     const output = await PDFDocument.create();
