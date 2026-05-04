@@ -1,10 +1,22 @@
 import express from "express";
 import upload from "../middlewares/uploadMiddleware";
-import { uploadPdf, extractPdf } from "../controllers/pdfController";
+import { PdfService } from "../services/implementation/PdfService";
+import { PdfController } from "../controllers/implementation/PdfController";
 
-const router = express.Router();
+const pdfService = new PdfService();
+const pdfController = new PdfController(pdfService);
 
-router.post("/upload", upload.single("pdf"), uploadPdf);
-router.post("/extract", extractPdf);
+const pdfRouter = express.Router();
 
-export default router;
+pdfRouter.post(
+  "/upload",
+  upload.single("pdf"),
+  (req, res) => pdfController.uploadPdf(req, res)
+);
+
+pdfRouter.post(
+  "/extract",
+  (req, res) => pdfController.extractPdf(req, res)
+);
+
+export default pdfRouter;
