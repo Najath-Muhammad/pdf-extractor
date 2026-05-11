@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import pdfRouter from "./routes/pdfRoutes";
 import dotenv from "dotenv";
+import { API_ROUTES } from "./constants/routes";
 
 dotenv.config();
 
@@ -21,9 +22,9 @@ app.use(
   })
 );
 app.use(express.json());
-app.use("/uploads", express.static(uploadsDir));
+app.use(API_ROUTES.UPLOADS, express.static(uploadsDir));
 
-app.use("/api/pdf", pdfRouter);
+app.use(`${API_ROUTES.BASE}${API_ROUTES.PDF.BASE}`, pdfRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
