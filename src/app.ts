@@ -22,7 +22,15 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(API_ROUTES.UPLOADS, express.static(uploadsDir));
+app.use(
+  API_ROUTES.UPLOADS,
+  express.static(uploadsDir, {
+    setHeaders: (res, filePath) => {
+      const fileName = path.basename(filePath);
+      res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+    },
+  })
+);
 
 app.use(`${API_ROUTES.BASE}${API_ROUTES.PDF.BASE}`, pdfRouter);
 
