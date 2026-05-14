@@ -5,6 +5,7 @@ import fs from "fs";
 import pdfRouter from "./routes/pdfRoutes";
 import dotenv from "dotenv";
 import { API_ROUTES } from "./constants/routes";
+import { errorHandler } from "./middlewares/errorMiddleware";
 
 dotenv.config();
 
@@ -33,6 +34,8 @@ app.use(
 );
 
 app.use(`${API_ROUTES.BASE}${API_ROUTES.PDF.BASE}`, pdfRouter);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
