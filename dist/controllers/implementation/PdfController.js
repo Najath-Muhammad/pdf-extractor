@@ -18,7 +18,7 @@ const responses_1 = require("../../constants/responses");
 class PdfController {
     constructor(_pdfService) {
         this._pdfService = _pdfService;
-        this.uploadPdf = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.uploadPdf = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
                 if (!req.file) {
                     res.status(responses_1.HTTP_STATUS.BAD_REQUEST).json({ error: responses_1.RESPONSE_MESSAGES.NO_FILE_UPLOADED });
@@ -36,11 +36,10 @@ class PdfController {
                 });
             }
             catch (err) {
-                const message = err instanceof Error ? err.message : responses_1.RESPONSE_MESSAGES.UPLOAD_FAILED;
-                res.status(responses_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: message });
+                next(err);
             }
         });
-        this.extractPdf = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.extractPdf = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { filePath, pages } = req.body;
             if (!filePath || !Array.isArray(pages) || pages.length === 0) {
                 res.status(responses_1.HTTP_STATUS.BAD_REQUEST).json({ error: responses_1.RESPONSE_MESSAGES.MISSING_EXTRACT_PARAMS });
@@ -51,8 +50,7 @@ class PdfController {
                 res.status(responses_1.HTTP_STATUS.OK).json({ message: responses_1.RESPONSE_MESSAGES.EXTRACT_SUCCESS, downloadUrl });
             }
             catch (err) {
-                const message = err instanceof Error ? err.message : responses_1.RESPONSE_MESSAGES.EXTRACT_FAILED;
-                res.status(responses_1.HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: message });
+                next(err);
             }
         });
     }

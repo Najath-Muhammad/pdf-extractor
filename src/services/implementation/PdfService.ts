@@ -18,33 +18,45 @@ export class PdfService implements IPdfService {
   }
 
   async getPageCount(filePath: string): Promise<number> {
-    const absolute = this._resolvePath(filePath);
-    const bytes = fs.readFileSync(absolute);
-    const doc = await PDFDocument.load(bytes);
-    return doc.getPageCount();
+    try {
+      const absolute = this._resolvePath(filePath);
+      const bytes = fs.readFileSync(absolute);
+      const doc = await PDFDocument.load(bytes);
+      return doc.getPageCount();
+    } catch (err) {
+      if (err instanceof Error) throw err;
+      // eslint-disable-next-line preserve-caught-error
+      throw new Error("Failed to retrieve PDF page count");
+    }
   }
 
   async extractPages(filePath: string, pages: number[]): Promise<string> {
-    const absolute = this._resolvePath(filePath);
-    const bytes = fs.readFileSync(absolute);
+    try {
+      const absolute = this._resolvePath(filePath);
+      const bytes = fs.readFileSync(absolute);
 
-    const source = await PDFDocument.load(bytes);
-    const totalPages = source.getPageCount();
+      const source = await PDFDocument.load(bytes);
+      const totalPages = source.getPageCount();
 
-    const validPages = pages.filter((p) => p >= 1 && p <= totalPages);
-    if (validPages.length === 0) {
-      throw new Error(RESPONSE_MESSAGES.NO_VALID_PAGES(totalPages));
+      const validPages = pages.filter((p) => p >= 1 && p <= totalPages);
+      if (validPages.length === 0) {
+        throw new Error(RESPONSE_MESSAGES.NO_VALID_PAGES(totalPages));
+      }
+
+      const output = await PDFDocument.create();
+      const copied = await output.copyPages(source, validPages.map((p) => p - 1));
+      copied.forEach((page) => output.addPage(page));
+
+      const outputBytes = await output.save();
+      const fileName = `extracted-${Date.now()}.pdf`;
+      const outputPath = path.join(process.cwd(), "uploads", fileName);
+      fs.writeFileSync(outputPath, outputBytes);
+
+      return `/uploads/${fileName}`;
+    } catch (err) {
+      if (err instanceof Error) throw err;
+      // eslint-disable-next-line preserve-caught-error
+      throw new Error(RESPONSE_MESSAGES.EXTRACT_FAILED);
     }
-
-    const output = await PDFDocument.create();
-    const copied = await output.copyPages(source, validPages.map((p) => p - 1));
-    copied.forEach((page) => output.addPage(page));
-
-    const outputBytes = await output.save();
-    const fileName = `extracted-${Date.now()}.pdf`;
-    const outputPath = path.join(process.cwd(), "uploads", fileName);
-    fs.writeFileSync(outputPath, outputBytes);
-
-    return `/uploads/${fileName}`;
   }
 }

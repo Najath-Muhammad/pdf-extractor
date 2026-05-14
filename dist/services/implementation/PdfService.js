@@ -29,30 +29,46 @@ class PdfService {
     }
     getPageCount(filePath) {
         return __awaiter(this, void 0, void 0, function* () {
-            const absolute = this._resolvePath(filePath);
-            const bytes = fs_1.default.readFileSync(absolute);
-            const doc = yield pdf_lib_1.PDFDocument.load(bytes);
-            return doc.getPageCount();
+            try {
+                const absolute = this._resolvePath(filePath);
+                const bytes = fs_1.default.readFileSync(absolute);
+                const doc = yield pdf_lib_1.PDFDocument.load(bytes);
+                return doc.getPageCount();
+            }
+            catch (err) {
+                if (err instanceof Error)
+                    throw err;
+                // eslint-disable-next-line preserve-caught-error
+                throw new Error("Failed to retrieve PDF page count");
+            }
         });
     }
     extractPages(filePath, pages) {
         return __awaiter(this, void 0, void 0, function* () {
-            const absolute = this._resolvePath(filePath);
-            const bytes = fs_1.default.readFileSync(absolute);
-            const source = yield pdf_lib_1.PDFDocument.load(bytes);
-            const totalPages = source.getPageCount();
-            const validPages = pages.filter((p) => p >= 1 && p <= totalPages);
-            if (validPages.length === 0) {
-                throw new Error(responses_1.RESPONSE_MESSAGES.NO_VALID_PAGES(totalPages));
+            try {
+                const absolute = this._resolvePath(filePath);
+                const bytes = fs_1.default.readFileSync(absolute);
+                const source = yield pdf_lib_1.PDFDocument.load(bytes);
+                const totalPages = source.getPageCount();
+                const validPages = pages.filter((p) => p >= 1 && p <= totalPages);
+                if (validPages.length === 0) {
+                    throw new Error(responses_1.RESPONSE_MESSAGES.NO_VALID_PAGES(totalPages));
+                }
+                const output = yield pdf_lib_1.PDFDocument.create();
+                const copied = yield output.copyPages(source, validPages.map((p) => p - 1));
+                copied.forEach((page) => output.addPage(page));
+                const outputBytes = yield output.save();
+                const fileName = `extracted-${Date.now()}.pdf`;
+                const outputPath = path_1.default.join(process.cwd(), "uploads", fileName);
+                fs_1.default.writeFileSync(outputPath, outputBytes);
+                return `/uploads/${fileName}`;
             }
-            const output = yield pdf_lib_1.PDFDocument.create();
-            const copied = yield output.copyPages(source, validPages.map((p) => p - 1));
-            copied.forEach((page) => output.addPage(page));
-            const outputBytes = yield output.save();
-            const fileName = `extracted-${Date.now()}.pdf`;
-            const outputPath = path_1.default.join(process.cwd(), "uploads", fileName);
-            fs_1.default.writeFileSync(outputPath, outputBytes);
-            return `/uploads/${fileName}`;
+            catch (err) {
+                if (err instanceof Error)
+                    throw err;
+                // eslint-disable-next-line preserve-caught-error
+                throw new Error(responses_1.RESPONSE_MESSAGES.EXTRACT_FAILED);
+            }
         });
     }
 }
