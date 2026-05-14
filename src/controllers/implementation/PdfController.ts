@@ -5,7 +5,7 @@ import { IPdfService } from "../../interfaces/IPdfService";
 import { HTTP_STATUS, RESPONSE_MESSAGES } from "../../constants/responses";
 
 export class PdfController implements IPdfController {
-  constructor(private readonly pdfService: IPdfService) {}
+  constructor(private readonly _pdfService: IPdfService) {}
 
   uploadPdf = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -18,7 +18,7 @@ export class PdfController implements IPdfController {
         .relative(process.cwd(), req.file.path)
         .replace(/\\/g, "/");
 
-      const pageCount = await this.pdfService.getPageCount(req.file.path);
+      const pageCount = await this._pdfService.getPageCount(req.file.path);
 
       res.status(HTTP_STATUS.OK).json({
         message: RESPONSE_MESSAGES.UPLOAD_SUCCESS,
@@ -41,7 +41,7 @@ export class PdfController implements IPdfController {
     }
 
     try {
-      const downloadUrl = await this.pdfService.extractPages(filePath, pages.map(Number));
+      const downloadUrl = await this._pdfService.extractPages(filePath, pages.map(Number));
       res.status(HTTP_STATUS.OK).json({ message: RESPONSE_MESSAGES.EXTRACT_SUCCESS, downloadUrl });
     } catch (err) {
       const message = err instanceof Error ? err.message : RESPONSE_MESSAGES.EXTRACT_FAILED;

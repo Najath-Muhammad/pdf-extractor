@@ -5,7 +5,7 @@ import { IPdfService } from "../../interfaces/IPdfService";
 import { RESPONSE_MESSAGES } from "../../constants/responses";
 
 export class PdfService implements IPdfService {
-  private resolvePath(filePath: string): string {
+  private _resolvePath(filePath: string): string {
     const absolute = path.isAbsolute(filePath)
       ? filePath
       : path.join(process.cwd(), filePath);
@@ -18,14 +18,14 @@ export class PdfService implements IPdfService {
   }
 
   async getPageCount(filePath: string): Promise<number> {
-    const absolute = this.resolvePath(filePath);
+    const absolute = this._resolvePath(filePath);
     const bytes = fs.readFileSync(absolute);
     const doc = await PDFDocument.load(bytes);
     return doc.getPageCount();
   }
 
   async extractPages(filePath: string, pages: number[]): Promise<string> {
-    const absolute = this.resolvePath(filePath);
+    const absolute = this._resolvePath(filePath);
     const bytes = fs.readFileSync(absolute);
 
     const source = await PDFDocument.load(bytes);
