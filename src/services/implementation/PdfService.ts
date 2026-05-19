@@ -25,7 +25,6 @@ export class PdfService implements IPdfService {
       return doc.getPageCount();
     } catch (err) {
       if (err instanceof Error) throw err;
-      // eslint-disable-next-line preserve-caught-error
       throw new Error("Failed to retrieve PDF page count");
     }
   }
